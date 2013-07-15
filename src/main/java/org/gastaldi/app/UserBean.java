@@ -26,6 +26,13 @@ public class UserBean implements Serializable
 
    public void login()
    {
-      System.out.println("Authentication Result: " + identity.login());
+      if (!identity.isLoggedIn())
+      {
+         System.out.println("Authentication Result: " + identity.login());
+      }
+      else
+      {
+         System.out.println("AGENT: " + identity.getAgent());
+      }
    }
 }

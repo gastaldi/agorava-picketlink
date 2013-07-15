@@ -9,7 +9,7 @@ package org.gastaldi.app.picketlink;
 
 import java.io.IOException;
 
-import javax.enterprise.event.Observes;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.agorava.LinkedIn;
 import org.agorava.core.api.UserProfile;
-import org.agorava.core.api.event.OAuthComplete;
 import org.agorava.core.api.oauth.OAuthService;
 import org.agorava.core.api.oauth.OAuthSession;
 import org.picketlink.annotations.PicketLink;
@@ -25,6 +24,7 @@ import org.picketlink.authentication.BaseAuthenticator;
 import org.picketlink.credential.DefaultLoginCredentials;
 import org.picketlink.idm.credential.Credentials.Status;
 
+@ApplicationScoped
 @PicketLink
 public class AgoravaAuthenticator extends BaseAuthenticator
 {
@@ -47,35 +47,29 @@ public class AgoravaAuthenticator extends BaseAuthenticator
    @Override
    public void authenticate()
    {
-      String authorizationUrl = service.getAuthorizationUrl();
-      try
+      OAuthSession session = service.getSession();
+      if (session == null)
       {
-         response.get().sendRedirect(authorizationUrl);
-      }
-      catch (IOException e)
-      {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-      credentials.setStatus(Status.IN_PROGRESS);
-      setStatus(AuthenticationStatus.DEFERRED);
-   }
-
-   public void observeLoginOutcome(@Observes OAuthComplete complete)
-   {
-      if (complete.getStatus() == org.agorava.core.api.event.SocialEvent.Status.SUCCESS)
-      {
-         OAuthSession eventData = complete.getEventData();
-         UserProfile userProfile = eventData.getUserProfile();
-         credentials.setUserId(userProfile.getId());
-         credentials.setCredential(eventData.getAccessToken());
-         credentials.setStatus(Status.VALID);
-         setStatus(AuthenticationStatus.SUCCESS);
+         String authorizationUrl = service.getAuthorizationUrl();
+         try
+         {
+            response.get().sendRedirect(authorizationUrl);
+         }
+         catch (IOException e)
+         {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+         credentials.setStatus(Status.IN_PROGRESS);
+         setStatus(AuthenticationStatus.DEFERRED);
       }
       else
       {
-         credentials.setStatus(Status.INVALID);
-         setStatus(AuthenticationStatus.FAILURE);
+         UserProfile userProfile = session.getUserProfile();
+         credentials.setUserId(userProfile.getId());
+         credentials.setCredential(session.getAccessToken());
+         credentials.setStatus(Status.VALID);
+         setStatus(AuthenticationStatus.SUCCESS);
       }
    }
 }

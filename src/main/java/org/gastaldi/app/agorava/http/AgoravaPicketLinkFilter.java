@@ -51,13 +51,14 @@ public class AgoravaPicketLinkFilter implements Filter
       producer.setRequest(httpRequest);
       producer.setResponse(httpResponse);
 
-      if ("/oauth_callback".equals(httpRequest.getRequestURI()))
+      String requestURI = httpRequest.getRequestURI();
+      if (requestURI.contains("oauth_callback"))
       {
          String verifier = httpRequest.getParameter(service.getVerifierParamName());
          service.setVerifier(verifier);
          service.initAccessToken();
          // TODO: Redirect someplace else
-         httpResponse.sendRedirect("/");
+         httpResponse.sendRedirect(httpRequest.getContextPath());
       }
       else
       {

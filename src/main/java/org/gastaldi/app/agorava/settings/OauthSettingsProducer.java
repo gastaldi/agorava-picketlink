@@ -26,7 +26,7 @@ public class OauthSettingsProducer
    public OAuthAppSettings produceLinkedInSettings()
    {
       OAuthAppSettingsBuilder builder = new SimpleOAuthAppSettingsBuilder();
-      return builder.apiKey("bnv8x51yjbdo").apiSecret("y0nvGzOYjw1KyKdV").callback("/oauth_callback").build();
+      return builder.apiKey("u0r1md2ia2y8").apiSecret("hBZsiNBAKuYrfFaU").callback("faces/oauth_callback.xhtml").build();
    }
 
    @SessionScoped

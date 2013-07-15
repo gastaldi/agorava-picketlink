@@ -13,6 +13,7 @@
 
 	<ui:define name="main">
 		<h:form>
+		#{identity.loggedIn}
 			<h:commandButton actionListener="#{userBean.login}" value="LOGIN" />
 		</h:form>
 	</ui:define>
