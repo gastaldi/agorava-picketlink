@@ -7,23 +7,18 @@
 
 package org.gastaldi.app.agorava.http;
 
-import java.io.IOException;
-
-import javax.inject.Inject;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.agorava.LinkedIn;
 import org.agorava.core.api.oauth.OAuthService;
 import org.picketlink.Identity;
 import org.picketlink.Identity.AuthenticationResult;
+
+import javax.enterprise.inject.Instance;
+import javax.inject.Inject;
+import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @WebFilter(filterName = "AgoravaPicketLink Filter",
          urlPatterns = "/*")
@@ -35,7 +30,7 @@ public class AgoravaPicketLinkFilter implements Filter
 
    @Inject
    @LinkedIn
-   OAuthService service;
+   Instance<OAuthService> services;
 
    @Inject
    Identity identity;
@@ -59,6 +54,7 @@ public class AgoravaPicketLinkFilter implements Filter
       String requestURI = httpRequest.getRequestURI();
       if (requestURI.contains("oauth_callback"))
       {
+         OAuthService service=services.get();
          String verifier = httpRequest.getParameter(service.getVerifierParamName());
          service.setVerifier(verifier);
          service.initAccessToken();
