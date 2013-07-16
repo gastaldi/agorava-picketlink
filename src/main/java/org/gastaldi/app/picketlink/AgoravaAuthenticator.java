@@ -23,6 +23,7 @@ import org.picketlink.annotations.PicketLink;
 import org.picketlink.authentication.BaseAuthenticator;
 import org.picketlink.credential.DefaultLoginCredentials;
 import org.picketlink.idm.credential.Credentials.Status;
+import org.picketlink.idm.model.SimpleUser;
 
 @ApplicationScoped
 @PicketLink
@@ -44,12 +45,27 @@ public class AgoravaAuthenticator extends BaseAuthenticator
    @LinkedIn
    OAuthService service;
 
+   // @Inject
+   // private transient ProfileService profileService;
+
    @Override
    public void authenticate()
    {
-      OAuthSession session = service.getSession();
-      if (session == null)
+      if (service.isConnected())
       {
+         OAuthSession session = service.getSession();
+         UserProfile userProfile = session.getUserProfile();
+         credentials.setCredential(session.getAccessToken());
+         setStatus(AuthenticationStatus.SUCCESS);
+
+//         LinkedInProfileFull userProfileFull = profileService.getUserProfileFull();
+         SimpleUser user = new SimpleUser(userProfile.getId());
+         user.setFirstName(userProfile.getFullName());
+         setAgent(user);
+      }
+      else
+      {
+
          String authorizationUrl = service.getAuthorizationUrl();
          try
          {
@@ -62,14 +78,6 @@ public class AgoravaAuthenticator extends BaseAuthenticator
          }
          credentials.setStatus(Status.IN_PROGRESS);
          setStatus(AuthenticationStatus.DEFERRED);
-      }
-      else
-      {
-         UserProfile userProfile = session.getUserProfile();
-         credentials.setUserId(userProfile.getId());
-         credentials.setCredential(session.getAccessToken());
-         credentials.setStatus(Status.VALID);
-         setStatus(AuthenticationStatus.SUCCESS);
       }
    }
 }

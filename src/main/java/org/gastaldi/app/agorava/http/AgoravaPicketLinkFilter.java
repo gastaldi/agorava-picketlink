@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.agorava.LinkedIn;
 import org.agorava.core.api.oauth.OAuthService;
+import org.picketlink.Identity;
+import org.picketlink.Identity.AuthenticationResult;
 
 @WebFilter(filterName = "AgoravaPicketLink Filter",
          urlPatterns = "/*")
@@ -34,6 +36,9 @@ public class AgoravaPicketLinkFilter implements Filter
    @Inject
    @LinkedIn
    OAuthService service;
+
+   @Inject
+   Identity identity;
 
    @Override
    public void init(FilterConfig filterConfig) throws ServletException
@@ -57,6 +62,9 @@ public class AgoravaPicketLinkFilter implements Filter
          String verifier = httpRequest.getParameter(service.getVerifierParamName());
          service.setVerifier(verifier);
          service.initAccessToken();
+         AuthenticationResult result = identity.login();
+         System.out.println("RESULT: " + result);
+
          // TODO: Redirect someplace else
          httpResponse.sendRedirect(httpRequest.getContextPath());
       }

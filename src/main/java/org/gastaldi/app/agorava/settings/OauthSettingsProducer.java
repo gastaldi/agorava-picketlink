@@ -20,13 +20,13 @@ import org.agorava.core.oauth.SimpleOAuthAppSettingsBuilder;
 public class OauthSettingsProducer
 {
 
-   @LinkedIn
    @ApplicationScoped
+   @LinkedIn
    @Produces
    public OAuthAppSettings produceLinkedInSettings()
    {
       OAuthAppSettingsBuilder builder = new SimpleOAuthAppSettingsBuilder();
-      return builder.apiKey("u0r1md2ia2y8").apiSecret("hBZsiNBAKuYrfFaU").callback("faces/oauth_callback.xhtml").build();
+      return builder.apiKey("u0r1md2ia2y8").apiSecret("hBZsiNBAKuYrfFaU").callback("oauth_callback").build();
    }
 
    @SessionScoped
